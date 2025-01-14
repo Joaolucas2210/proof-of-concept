@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: test_poc_database
+      POSTGRES_USER: poc_user
+      POSTGRES_PASSWORD: poc_password
+    ports:
+      - "5433:5432"
+  app:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: poc_user
+      DB_PASSWORD: poc_password
+      DB_NAME: test_poc_database
+      PYTHONPATH: /app
+    command: ["pytest", "-v", "--cov=src"]
