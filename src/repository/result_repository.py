@@ -41,12 +41,20 @@ class ResultRepository(BaseRepository):
         query = """
         SELECT tipo_cruzamento, chave1, chave2, total_anos
         FROM resultados
-        WHERE (tipo_cruzamento, chave1, chave2, total_anos) IN %s
+        WHERE (tipo_cruzamento, chave1, chave2, total_anos) IN (
+            SELECT tipo_cruzamento, chave1, chave2, total_anos
+            FROM UNNEST(%s::TEXT[], %s::TEXT[], %s::TEXT[], %s::BIGINT[]) AS t(tipo_cruzamento, chave1, chave2, total_anos)
+        )
         """
-        values = [(r.tipo_cruzamento, r.chave1, r.chave2, r.total_anos) for r in results]
+        values = [
+            [r.tipo_cruzamento for r in results],
+            [r.chave1 for r in results],
+            [r.chave2 for r in results],
+            [r.total_anos for r in results]
+        ]
         try:
             with self.connection.cursor() as cursor:
-                extras.execute_values(cursor, query, values, template=None, page_size=100)
+                cursor.execute(query, values)
                 for record in cursor.fetchall():
                     existing_records.add((record[0], record[1], record[2], record[3]))
         except Exception as e:
