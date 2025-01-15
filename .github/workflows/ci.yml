@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: pass
+          POSTGRES_DB: my_database
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U user"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        python -m venv venv
+        source venv/bin/activate
+        pip install -r requirements.txt
+
+    - name: Wait for DB to be ready
+      run: |
+        until nc -zv localhost 5432; do
+          echo "Waiting for PostgreSQL to be ready..."
+          sleep 5
+        done
+
+    - name: Run tests
+      run: |
+        source venv/bin/activate
+        pytest -v --cov=src
+
+    - name: Approve PR if tests pass
+      if: success()
+      run: |
+        echo "Tests passed, PR can be merged."
