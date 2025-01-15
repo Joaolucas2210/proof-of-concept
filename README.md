@@ -203,6 +203,10 @@ Pressione ```Ctrl+C``` no terminal onde o docker-compose está rodando ou execut
 
 ### 4.1. Executando Localmente
 
+Clone o repositório:
+
+``` git clone git@github.com:Joaolucas2210/proof-of-concept.git```
+
 Configure as Variáveis de Ambiente:
 
 As configurações de banco de dados estão centralizadas no arquivo `config.py`. Certifique-se de que as variáveis de ambiente estão definidas corretamente ou ajuste o arquivo conforme necessário.
