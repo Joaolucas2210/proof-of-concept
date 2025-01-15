@@ -16,7 +16,7 @@ def sample_excel_file(tmp_path):
     file_path = tmp_path / "sample.xlsx"
     with pd.ExcelWriter(file_path) as writer:
         df.to_excel(writer, index=False, startrow=5)
-    return file_path  
+    return file_path
 
 def test_read_excel(sample_excel_file):
     reader = ExcelReader(sample_excel_file)
@@ -44,3 +44,4 @@ def test_cross_tabulations(sample_excel_file):
     assert 'sexo_x_local' in cross_tabs
     assert 'local_x_idade' in cross_tabs
     assert 'sexo_x_idade' in cross_tabs
+## tests/test_xlsx_reader.py
